@@ -526,6 +526,56 @@ select {
 ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--border); }
 
+/* ---- LIGHT MODE ---- */
+
+body.light {
+    --bg: #f6f8fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f5;
+    --surface3: #e8eaed;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --text-dim: #656d76;
+    --accent: #0969da;
+    --accent-hover: #0550ae;
+    --green: #1a7f37;
+    --red: #cf222e;
+    --orange: #9a6700;
+}
+
+body.light .dialog {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+body.light input[type="color"] {
+    border: 1px solid var(--border);
+}
+
+/* ---- THEME TOGGLE ---- */
+
+.theme-toggle {
+    padding: 5px 10px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    transition: all 0.15s;
+}
+
+.theme-toggle:hover {
+    color: var(--text);
+    background: var(--border);
+}
+
+/* ---- FILE INPUT (hidden, for import) ---- */
+
+.file-input-hidden {
+    display: none;
+}
+
 /* ---- RESPONSIVE ---- */
 
 @media (max-width: 768px) {
