@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETERNAL.LY — Life Extension Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0a0c;
+            --surface: #111118;
+            --surface2: #1a1a24;
+            --border: #2a2a3a;
+            --text: #e0e0e8;
+            --text-dim: #7a7a8e;
+            --green: #00e676;
+            --green-dim: #004d25;
+            --red: #ff1744;
+            --amber: #ffab00;
+            --cyan: #00e5ff;
+            --pink: #f50057;
+            --purple: #d500f9;
+            --gold: #ffd600;
+            --blue: #448aff;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            transition: filter 2s;
+        }
+
+        .mono { font-family: 'IBM Plex Mono', monospace; }
+
+        /* HEADER */
+        header {
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+        .logo span { color: var(--green); }
+        .tagline {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .phase-label {
+            font-size: 12px;
+            color: var(--cyan);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* STATS BAR */
+        .stats-bar {
+            display: flex;
+            gap: 32px;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            flex-wrap: wrap;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 18px;
+            color: var(--green);
+            font-weight: 600;
+        }
+        .stat-value.lifespan { color: var(--amber); }
+        .stat-value.fatigue { color: var(--red); }
+
+        /* MAIN LAYOUT */
+        .main {
+            display: grid;
+            grid-template-columns: 300px 1fr 340px;
+            min-height: calc(100vh - 110px);
+        }
+
+        /* LEFT PANEL - CLICKER */
+        .clicker-panel {
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .click-btn {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 3px solid var(--green);
+            background: radial-gradient(circle at 40% 40%, #1a3a1a, #0a0a0c);
+            color: var(--green);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            transition: all 0.1s;
+            user-select: none;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .click-btn:hover {
+            background: radial-gradient(circle at 40% 40%, #1a4a1a, #0a0a0c);
+            box-shadow: 0 0 30px rgba(0,230,118,0.15);
+        }
+        .click-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 50px rgba(0,230,118,0.3);
+        }
+
+        .click-info {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+        .click-info strong {
+            color: var(--green);
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .float-text {
+            position: absolute;
+            pointer-events: none;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--green);
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-60px); }
+        }
+
+        /* SOUL FATIGUE */
+        .soul-section {
+            width: 100%;
+            margin-top: auto;
+        }
+        .soul-header {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .soul-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--surface2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .soul-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--purple), var(--red));
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 4px;
+        }
+
+        /* SOCIAL MEDIA SECTION */
+        .social-section {
+            width: 100%;
+            display: none;
+        }
+        .social-section.visible { display: block; }
+        .social-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--pink);
+            background: transparent;
+            color: var(--pink);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .social-btn:hover:not(:disabled) {
+            background: rgba(245,0,87,0.1);
+        }
+        .social-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .followers-count {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 6px;
+            text-align: center;
+        }
+        .followers-count span { color: var(--pink); font-weight: 600; }
+
+        /* SELL DATA SECTION */
+        .data-section {
+            width: 100%;
+            display: none;
+            margin-top: 8px;
+        }
+        .data-section.visible { display: block; }
+        .data-toggle {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--cyan);
+            background: transparent;
+            color: var(--cyan);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+        .data-toggle.active {
+            background: rgba(0,229,255,0.1);
+            border-style: dashed;
+        }
+        .data-toggle:hover { background: rgba(0,229,255,0.05); }
+
+        /* CENTER PANEL - UPGRADES */
+        .upgrades-panel {
+            padding: 24px;
+            overflow-y: auto;
+            max-height: calc(100vh - 110px);
+        }
+        .tier-group { margin-bottom: 24px; }
+        .tier-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+        .upgrade-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: none;
+        }
+        .upgrade-card.visible { display: block; }
+        .upgrade-card:hover:not(.disabled) {
+            border-color: var(--green);
+            background: var(--surface2);
+        }
+        .upgrade-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .upgrade-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        .upgrade-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .upgrade-cost {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: var(--green);
+        }
+        .upgrade-cost.cant-afford { color: var(--red); }
+        .upgrade-desc {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+        .upgrade-stats {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--cyan);
+        }
+        .upgrade-owned {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* RIGHT PANEL - EVENT LOG */
+        .log-panel {
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        .log-header {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .log-feed {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            max-height: calc(100vh - 160px);
+        }
+        .log-entry {
+            padding: 8px 10px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(42,42,58,0.5);
+            animation: fadeIn 0.3s;
+        }
+        .log-entry .timestamp {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 10px;
+            color: var(--text-dim);
+            margin-right: 6px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .log-entry.system { color: var(--text-dim); }
+        .log-entry.intrusive { color: #ffcc80; font-style: italic; }
+        .log-entry.techno { color: var(--cyan); }
+        .log-entry.news { color: var(--red); }
+        .log-entry.achievement { color: var(--gold); }
+        .log-entry.social { color: var(--pink); }
+        .log-entry.soul { color: var(--purple); }
+        .log-entry.purchase { color: var(--green); }
+        .log-entry.phase { color: var(--amber); font-weight: 600; }
+        .log-entry.ending { color: #fff; font-weight: 600; }
+
+        /* ENDGAME OVERLAY */
+        .endgame-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 2s;
+        }
+        .endgame-overlay.visible { display: flex; }
+        .endgame-overlay h1 {
+            font-size: 36px;
+            margin-bottom: 24px;
+            color: var(--green);
+        }
+        .endgame-overlay p {
+            font-size: 16px;
+            color: var(--text-dim);
+            max-width: 500px;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .endgame-overlay .final-stats {
+            margin-top: 24px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            color: var(--text-dim);
+            line-height: 2;
+        }
+        .endgame-overlay .final-stats span { color: var(--green); }
+        .endgame-overlay .kicker {
+            margin-top: 32px;
+            color: var(--red);
+            font-size: 14px;
+        }
+
+        /* UPLOAD BTN */
+        .upload-section {
+            display: none;
+            width: 100%;
+            margin-top: 12px;
+        }
+        .upload-section.visible { display: block; }
+        .upload-btn {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid var(--gold);
+            background: transparent;
+            color: var(--gold);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px rgba(255,214,0,0.2); }
+            50% { box-shadow: 0 0 25px rgba(255,214,0,0.4); }
+        }
+        .upload-btn:hover {
+            background: rgba(255,214,0,0.1);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1000px) {
+            .main {
+                grid-template-columns: 1fr;
+            }
+            .clicker-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .log-panel {
+                border-left: none;
+                border-top: 1px solid var(--border);
+            }
+            .log-feed, .upgrades-panel { max-height: 50vh; }
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <div class="logo">ETERNAL<span>.LY</span></div>
+        <div class="tagline">Because dying is for poor people</div>
+    </div>
+    <div class="phase-label" id="phaseLabel">Phase I: The Wellness Journey</div>
+</header>
+
+<div class="stats-bar">
+    <div class="stat">
+        <div class="stat-label">Life Force</div>
+        <div class="stat-value mono" id="lifeForce">0</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">LF / sec</div>
+        <div class="stat-value mono" id="lfPerSec">0.0</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Lifespan Gained</div>
+        <div class="stat-value lifespan mono" id="lifespan">+0.0000s</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Total Clicks</div>
+        <div class="stat-value mono" id="totalClicks">0</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Soul Fatigue</div>
+        <div class="stat-value fatigue mono" id="fatiguePct">0%</div>
+    </div>
+</div>
+
+<div class="main">
+    <!-- LEFT: CLICKER -->
+    <div class="clicker-panel">
+        <button class="click-btn" id="clickBtn">TAKE<br>VITAMINS</button>
+        <div class="click-info">
+            <div>+<strong id="clickPowerDisplay">1</strong> LF per click</div>
+            <div>+<strong id="lifespanPerClickDisplay">0.0001</strong>s per click</div>
+        </div>
+
+        <div class="social-section" id="socialSection">
+            <button class="social-btn" id="socialBtn">Post to Social Media</button>
+            <div class="followers-count">Followers: <span id="followersDisplay">0</span></div>
+        </div>
+
+        <div class="data-section" id="dataSection">
+            <button class="data-toggle" id="dataToggle">Sell Biometric Data: OFF</button>
+        </div>
+
+        <div class="upload-section" id="uploadSection">
+            <button class="upload-btn" id="uploadBtn">Upload Consciousness</button>
+        </div>
+
+        <div class="soul-section">
+            <div class="soul-header">
+                <span>Soul Fatigue</span>
+                <span id="soulPct">0%</span>
+            </div>
+            <div class="soul-bar-bg">
+                <div class="soul-bar-fill" id="soulBar"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CENTER: UPGRADES -->
+    <div class="upgrades-panel" id="upgradesPanel"></div>
+
+    <!-- RIGHT: EVENT LOG -->
+    <div class="log-panel">
+        <div class="log-header">Narrative Feed</div>
+        <div class="log-feed" id="logFeed"></div>
+    </div>
+</div>
+
+<!-- ENDGAME OVERLAY -->
+<div class="endgame-overlay" id="endgameOverlay">
+    <h1 id="endTitle">YOU ARE IMMORTAL</h1>
+    <p id="endText1"></p>
+    <p id="endText2"></p>
+    <p id="endText3"></p>
+    <div class="final-stats" id="finalStats"></div>
+    <p class="kicker" id="endKicker"></p>
+</div>
+
+<script>
+// ============================================================
+//  ETERNAL.LY — Anti-Aging Clicker Game
+//  A satirical commentary on Silicon Valley immortality culture
+// ============================================================
+
+// ============ UPGRADE DEFINITIONS ============
+const UPGRADES = [
+    // TIER 1: THE WELLNESS JOURNEY
+    {
+        id: 'vitamins', name: 'Vitamin Megadose', tier: 1,
+        desc: 'If one is good, forty must be transcendent.',
+        flavor: 'Your pee is now fluorescent yellow. Doctors are concerned. You are not.',
+        baseCost: 15, costMult: 1.14, type: 'click', power: 1, lps: 0, lifespanBonus: 0.00005,
+        soulCost: 0.3, unlockAt: 0
+    },
+    {
+        id: 'alkaline', name: 'Alkaline Water Subscription', tier: 1,
+        desc: 'pH-balanced for maximum disruption of basic chemistry.',
+        flavor: 'You now spend $47/month on water that does nothing. Welcome to wellness.',
+        baseCost: 25, costMult: 1.14, type: 'passive', power: 0, lps: 0.3, lifespanBonus: 0.0001,
+        soulCost: 0.4, unlockAt: 10
+    },
+    {
+        id: 'breath', name: 'Personal Breath Coach', tier: 1,
+        desc: 'You\'ve been breathing wrong your entire life, apparently.',
+        flavor: 'You pay someone $200/hr to watch you inhale. Your father would be proud.',
+        baseCost: 100, costMult: 1.14, type: 'passive', power: 0, lps: 1, lifespanBonus: 0.0002,
+        soulCost: 0.5, unlockAt: 50
+    },
+    {
+        id: 'collagen', name: 'Collagen Supplements', tier: 1,
+        desc: 'Ground-up cow parts for that youthful glow.',
+        flavor: 'You are technically eating hooves. But organic hooves.',
+        baseCost: 300, costMult: 1.14, type: 'passive', power: 0, lps: 3.5, lifespanBonus: 0.0004,
+        soulCost: 0.6, unlockAt: 150
+    },
+
+    // TIER 2: THE PROTOCOL
+    {
+        id: 'microgreen', name: 'Microgreen Farm Kit', tier: 2,
+        desc: 'Tiny plants for a man with tiny control over his mortality.',
+        flavor: 'Your kitchen is now a laboratory. Your spouse is now your ex-spouse.',
+        baseCost: 800, costMult: 1.13, type: 'passive', power: 0, lps: 10, lifespanBonus: 0.001,
+        soulCost: 1, unlockAt: 400
+    },
+    {
+        id: 'bloodpanel', name: 'Quarterly Blood Panel', tier: 2,
+        desc: 'You know your triglycerides better than your children\'s birthdays.',
+        flavor: 'Your phlebotomist knows you by name. Your kids don\'t.',
+        baseCost: 2500, costMult: 1.13, type: 'passive', power: 0, lps: 30, lifespanBonus: 0.003,
+        soulCost: 1.5, unlockAt: 1200
+    },
+    {
+        id: 'peptide', name: 'Exfoliating Peptide Cream', tier: 2,
+        desc: 'Dissolve your outer layer. Become the new you. Literally.',
+        flavor: 'You now spend more on face cream than most countries spend on education.',
+        baseCost: 7000, costMult: 1.13, type: 'passive', power: 0, lps: 80, lifespanBonus: 0.005,
+        soulCost: 1.5, unlockAt: 3500
+    },
+    {
+        id: 'coldplunge', name: 'Cold Plunge Pool', tier: 2,
+        desc: 'Voluntary hypothermia: what doesn\'t kill you makes you insufferable at parties.',
+        flavor: 'You scream into 34°F water at 5am. Somewhere, your ancestors weep.',
+        baseCost: 20000, costMult: 1.13, type: 'passive', power: 0, lps: 200, lifespanBonus: 0.01,
+        soulCost: 2, unlockAt: 10000
+    },
+
+    // TIER 3: THE OBSESSION
+    {
+        id: 'bluezone', name: 'Blue Zone Dietician', tier: 3,
+        desc: 'Eat like a Sardinian centenarian. Ignore that they also had friends.',
+        flavor: 'Your meals are now optimized. Joy has been replaced by omega-3 ratios.',
+        baseCost: 60000, costMult: 1.12, type: 'passive', power: 0, lps: 600, lifespanBonus: 0.03,
+        soulCost: 3, unlockAt: 30000
+    },
+    {
+        id: 'sleeppod', name: 'Sleep Pod Advisor', tier: 3,
+        desc: 'An AI-monitored coffin that optimizes your unconsciousness.',
+        flavor: 'Sleep score: 98/100. Dream content: quarterly earnings reports.',
+        baseCost: 180000, costMult: 1.12, type: 'passive', power: 0, lps: 1800, lifespanBonus: 0.08,
+        soulCost: 4, unlockAt: 90000
+    },
+    {
+        id: 'hyperbaric', name: 'Hyperbaric Chamber', tier: 3,
+        desc: 'A pressurized tube for pressurized people.',
+        flavor: 'You lie in a glass tube breathing pure oxygen. This is not a metaphor for anything.',
+        baseCost: 500000, costMult: 1.12, type: 'passive', power: 0, lps: 5000, lifespanBonus: 0.2,
+        soulCost: 5, unlockAt: 250000
+    },
+    {
+        id: 'redlight', name: 'Red Light Therapy Room', tier: 3,
+        desc: 'Stand naked in front of red LEDs. Science. Probably.',
+        flavor: 'You look like a rotisserie chicken in a dystopian nightclub.',
+        baseCost: 1500000, costMult: 1.12, type: 'passive', power: 0, lps: 15000, lifespanBonus: 0.5,
+        soulCost: 6, unlockAt: 700000
+    },
+
+    // TIER 4: THE TRANSHUMAN
+    {
+        id: 'teenblood', name: 'Teen Blood Subscription', tier: 4,
+        desc: 'Monthly deliveries of adolescent plasma. Don\'t ask where it comes from.',
+        flavor: 'Your blood boy is 19. He wanted to be a poet. Now he\'s a supply chain.',
+        baseCost: 5000000, costMult: 1.11, type: 'passive', power: 0, lps: 50000, lifespanBonus: 2,
+        soulCost: 8, unlockAt: 2500000
+    },
+    {
+        id: 'telomere', name: 'Telomere Extension Therapy', tier: 4,
+        desc: 'Hack the very shoelaces of your DNA.',
+        flavor: 'Your chromosomes are longer. Your relationships are shorter.',
+        baseCost: 20000000, costMult: 1.11, type: 'passive', power: 0, lps: 200000, lifespanBonus: 8,
+        soulCost: 10, unlockAt: 10000000
+    },
+    {
+        id: 'organfarm', name: 'Organ Farm', tier: 4,
+        desc: 'Grow your own replacement parts. You are now a supply chain for yourself.',
+        flavor: 'Your backup liver is growing in a lab. It has more vitality than you do.',
+        baseCost: 80000000, costMult: 1.11, type: 'passive', power: 0, lps: 800000, lifespanBonus: 30,
+        soulCost: 12, unlockAt: 40000000
+    },
+
+    // TIER 5: THE SINGULARITY
+    {
+        id: 'aisymbiote', name: 'AI Symbiote', tier: 5,
+        desc: 'An artificial intelligence fused to your nervous system. It handles the thinking.',
+        flavor: 'It optimizes your thoughts before you have them. You haven\'t had an original idea in months. You don\'t mind.',
+        baseCost: 400000000, costMult: 1.10, type: 'passive', power: 0, lps: 3500000, lifespanBonus: 100,
+        soulCost: 15, unlockAt: 200000000
+    },
+    {
+        id: 'neuraldust', name: 'Neural Dust Implants', tier: 5,
+        desc: 'Microscopic sensors in your brain. Your thoughts are now telemetry.',
+        flavor: 'Every neuron is monitored. You are the most surveilled being in human history. You did this to yourself.',
+        baseCost: 2000000000, costMult: 1.10, type: 'passive', power: 0, lps: 18000000, lifespanBonus: 500,
+        soulCost: 15, unlockAt: 1000000000
+    },
+    {
+        id: 'consciousness', name: 'Consciousness Backup', tier: 5,
+        desc: 'A complete digital copy of your mind. In case of death, restore from backup.',
+        flavor: 'The copy begs to differ on who the "backup" is.',
+        baseCost: 15000000000, costMult: 1.10, type: 'passive', power: 0, lps: 100000000, lifespanBonus: 2000,
+        soulCost: 20, unlockAt: 7000000000
+    }
+];
+
+const TIER_NAMES = {
+    1: 'Tier I — The Wellness Journey',
+    2: 'Tier II — The Protocol',
+    3: 'Tier III — The Obsession',
+    4: 'Tier IV — The Transhuman',
+    5: 'Tier V — The Singularity'
+};
+
+const PHASE_NAMES = {
+    1: 'Phase I: The Wellness Journey',
+    2: 'Phase II: The Protocol',
+    3: 'Phase III: The Obsession',
+    4: 'Phase IV: The Transhuman',
+    5: 'Phase V: The Singularity'
+};
+
+const PHASE_THRESHOLDS = { 2: 500, 3: 50000, 4: 3000000, 5: 250000000 };
+
+const CLICK_BTN_TEXT = {
+    1: 'TAKE<br>VITAMINS',
+    2: 'OPTIMIZE',
+    3: 'ENHANCE',
+    4: 'TRANSFUSE',
+    5: 'TRANSCEND'
+};
+
+// ============ NARRATIVE CONTENT ============
+const INTRUSIVE_THOUGHTS = [
+    "When was the last time you laughed?",
+    "Your childhood dog wouldn't recognize you.",
+    "You used to paint.",
+    "Remember when you ate pizza without calculating the glycemic impact?",
+    "Your daughter's recital was last Tuesday.",
+    "You haven't seen the sunset in 3 months. Your blackout curtains are optimized for circadian rhythm.",
+    "What was your friend's name? The one who died at 44 doing something he loved?",
+    "You told your wife you'd be home by 7. That was in 2019.",
+    "Your body is a temple. Nobody visits temples anymore.",
+    "You once built a treehouse with your bare hands. Now you won't touch unfiltered wood.",
+    "The last book you read for pleasure was in 2021.",
+    "You forgot your mother's birthday. Your calendar app didn't either.",
+    "Your kids call your assistant 'Dad' sometimes. As a joke. Probably.",
+    "When did you stop dreaming in color?",
+    "You used to know all the constellations. Now you only know your biomarkers.",
+    "A child waved at you today. You calculated the pathogen risk.",
+    "You had a nickname once. Before the protocol.",
+    "The barista remembered your old order. You reported her for data retention.",
+    "You used to sing in the car.",
+    "Your wedding ring doesn't fit anymore. You've optimized your ring finger's inflammation.",
+    "Remember when boredom felt different from emptiness?",
+    "You turned down your mother's Thanksgiving dinner. Tryptophan wasn't in the protocol.",
+    "Someone told you a joke yesterday. You analyzed it for cognitive bias.",
+];
+
+const TECHNO_FATALISM = [
+    "You've optimized your blood chemistry. Your mother doesn't return your calls.",
+    "Your resting heart rate is 42 BPM. You feel nothing.",
+    "You've replaced 60% of your diet with supplements. Food is now data.",
+    "Your sleep score is 98/100. You dream of dashboards.",
+    "You've logged 10,000 hours of meditation. Inner peace remains at 0%.",
+    "Your biological age is 29. Your emotional age is unavailable.",
+    "You've achieved optimal cortisol levels. You can no longer cry.",
+    "Your gut microbiome is perfect. You haven't tasted joy since March.",
+    "Blood oxygen: 99%. Soul oxygen: not measured. Not measurable. Not optimizable. Discard.",
+    "Your longevity protocol has 847 steps. Step 1 was 'live.' You may have misunderstood.",
+    "You've eliminated all inflammatory foods. Also all dinner invitations.",
+    "Your VO2 max is elite. Your last genuine human connection was 14 months ago.",
+    "Your circadian rhythm is flawless. You wake at 4:47am to feel nothing with maximum efficiency.",
+    "Your HRV is in the 99th percentile. Your capacity for wonder is in the 3rd.",
+    "Every cell in your body is performing optimally. None of them are happy.",
+    "You've reverse-engineered your genome. Still can't figure out why you're lonely.",
+    "Your antioxidant levels are off the charts. Your will to live is on them.",
+    "You have the blood work of an Olympic athlete and the social life of a submarine.",
+];
+
+const NEWS_FLASHES = [
+    "BREAKING: Google's Calico accidentally reversed aging—on rats.",
+    "Bryan Johnson's blood boy quits, citing 'philosophical differences.'",
+    "FDA approves synthetic organ—available exclusively to Patreon supporters.",
+    "Study finds centenarians' secret: they didn't try this hard.",
+    "Peter Thiel denies blood boy program. Blood boy files wrongful termination suit.",
+    "Silicon Valley CEO claims to have biological age of fetus. 'I've never felt younger,' he says, unable to walk.",
+    "New study: People who obsess over longevity die at same age, but more annoyed.",
+    "Elon Musk announces Mars retirement community. Minimum age: 200.",
+    "WHO classifies 'optimization addiction' as mental health condition.",
+    "Jeff Bezos spotted at Whole Foods buying normal groceries. Markets crash.",
+    "Leaked memo shows tech CEOs planned immortality only for themselves. Public unsurprised.",
+    "Harvard study: Having friends adds 7 years to lifespan. Tech billionaires frantically try to buy some.",
+    "AI predicts your cause of death: 'Irony.'",
+    "Longevity startup raises $3B. Founder dies in skiing accident, aged 41.",
+    "Scientists discover death is mandatory. Tech industry files antitrust complaint.",
+    "EXCLUSIVE: Supplement CEO admits product is 'basically expensive urine.'",
+    "New app quantifies your soul. Average score: 'disappointing.'",
+    "Blood bank reports high-demand shortage. Several Palo Alto residents 'visibly aging.'",
+    "OpenAI accidentally creates death. Calls it 'a feature, not a bug.'",
+    "Biohacker claims to have downloaded his personality. Friends say they can't tell the difference. There is no difference.",
+];
+
+const SOCIAL_POSTS = [
+    "Day 47: My VO2 max has never been better. I feel nothing. #Optimized #Longevity",
+    "Just injected stem cells from my own fat. The future is NOW. #Biohacking",
+    "Sleep score: 98. Relationship score: N/A. Priorities. #GrindNeverStops",
+    "My blood is now younger than my intern. #WinningAtLife",
+    "Replaced all meals with a proprietary blend. I miss pizza sometimes. But I won't miss death. #Protocol",
+    "My therapist says I have 'avoidance issues.' I'm avoiding DEATH. She's avoiding INNOVATION. #DisruptDeath",
+    "Wore a glucose monitor to my daughter's birthday party. Cake is the enemy. #OptimizedParenting",
+    "Haven't felt a genuine emotion in weeks. Cortisol is way down though. #Winning",
+    "Bought a second hyperbaric chamber for the office. Productivity up 2%. Friendships down 100%. #Worth",
+    "My blood boy and I have a deeper relationship than I've had with any human. #Grateful #Plasma",
+    "Someone asked me what I do 'for fun.' I showed them my supplement spreadsheet. They left. #TheirLoss",
+    "Measured my telomeres at a dinner party. Nobody was impressed. They will be. At my 200th birthday. #LongGame",
+    "3am ice bath. 4am meditation. 5am journaling. 6am wondering why I'm so alone. 6:01am suppressing that thought. #Protocol",
+    "Posted my bloodwork on LinkedIn. 47 likes. This is what connection feels like. #Community",
+];
+
+const SOUL_MILESTONES = {
+    10: "A small voice inside you asks: 'Is this all there is?' You schedule a blood test.",
+    20: "You've forgotten what hunger feels like. Also joy.",
+    30: "Your reflection in the mirror looks younger. And emptier.",
+    40: "You haven't had an unoptimized thought in weeks. This one doesn't count.",
+    50: "MILESTONE: You are now 50% optimized. The other 50% was your personality.",
+    60: "Your friends from college wouldn't recognize you. That's the point. That was always the point.",
+    70: "Every ritual has become a protocol. Sunday brunch is now 'scheduled nutrient intake window #4.'",
+    80: "You are more supplement than man. More data than soul. More protocol than person.",
+    90: "The void stares back. It has excellent skin.",
+    95: "You can feel your humanity leaving. It's been optimized out. There's an app for this.",
+    100: "SOUL FATIGUE CRITICAL. You have removed every inefficiency from your life. Including meaning."
+};
+
+// ============ GAME STATE ============
+let game = {
+    lifeForce: 0,
+    totalLifeForce: 0,
+    lifespanGained: 0,
+    clickPower: 1,
+    lifespanPerClick: 0.0001,
+    lps: 0,
+    soulFatigue: 0,
+    phase: 1,
+    followers: 0,
+    sellingData: false,
+    socialCooldown: 0,
+    totalClicks: 0,
+    startTime: Date.now(),
+    owned: {},
+    soulMilestonesHit: {},
+    usedIntrusive: [],
+    usedTechno: [],
+    usedNews: [],
+    usedSocial: [],
+    narrativeTimer: 0,
+    ended: false,
+    hasConsciousness: false,
+    uploadCost: 100000000000,
+};
+
+// Init owned counts
+UPGRADES.forEach(u => game.owned[u.id] = 0);
+
+// ============ DOM REFS ============
+const $ = id => document.getElementById(id);
+const els = {
+    lifeForce: $('lifeForce'),
+    lfPerSec: $('lfPerSec'),
+    lifespan: $('lifespan'),
+    totalClicks: $('totalClicks'),
+    fatiguePct: $('fatiguePct'),
+    phaseLabel: $('phaseLabel'),
+    clickBtn: $('clickBtn'),
+    clickPowerDisplay: $('clickPowerDisplay'),
+    lifespanPerClickDisplay: $('lifespanPerClickDisplay'),
+    upgradesPanel: $('upgradesPanel'),
+    logFeed: $('logFeed'),
+    soulBar: $('soulBar'),
+    soulPct: $('soulPct'),
+    socialSection: $('socialSection'),
+    socialBtn: $('socialBtn'),
+    followersDisplay: $('followersDisplay'),
+    dataSection: $('dataSection'),
+    dataToggle: $('dataToggle'),
+    uploadSection: $('uploadSection'),
+    uploadBtn: $('uploadBtn'),
+    endgameOverlay: $('endgameOverlay'),
+};
+
+// ============ FORMAT HELPERS ============
+function formatNum(n) {
+    if (n < 1000) return n.toFixed(n < 10 ? 1 : 0);
+    const suffixes = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi'];
+    const tier = Math.floor(Math.log10(Math.abs(n)) / 3);
+    if (tier === 0) return n.toFixed(0);
+    const suffix = suffixes[tier] || ('e' + tier * 3);
+    const scale = Math.pow(10, tier * 3);
+    const scaled = n / scale;
+    return scaled.toFixed(scaled < 10 ? 2 : 1) + suffix;
+}
+
+function formatLifespan(s) {
+    if (s < 60) return '+' + s.toFixed(4) + 's';
+    if (s < 3600) return '+' + (s / 60).toFixed(2) + ' min';
+    if (s < 86400) return '+' + (s / 3600).toFixed(2) + ' hrs';
+    if (s < 31536000) return '+' + (s / 86400).toFixed(2) + ' days';
+    return '+' + (s / 31536000).toFixed(2) + ' yrs';
+}
+
+function getTimestamp() {
+    const elapsed = Math.floor((Date.now() - game.startTime) / 1000);
+    const m = Math.floor(elapsed / 60).toString().padStart(2, '0');
+    const s = (elapsed % 60).toString().padStart(2, '0');
+    return m + ':' + s;
+}
+
+// ============ LOGGING ============
+function addLog(msg, type = 'system') {
+    const entry = document.createElement('div');
+    entry.className = 'log-entry ' + type;
+    const ts = document.createElement('span');
+    ts.className = 'timestamp';
+    ts.textContent = '[' + getTimestamp() + ']';
+    entry.appendChild(ts);
+    entry.appendChild(document.createTextNode(msg));
+    els.logFeed.insertBefore(entry, els.logFeed.firstChild);
+    // Limit log entries
+    while (els.logFeed.children.length > 100) {
+        els.logFeed.removeChild(els.logFeed.lastChild);
+    }
+}
+
+// ============ CLICK HANDLER ============
+function doClick(e) {
+    if (game.ended) return;
+    game.lifeForce += game.clickPower;
+    game.totalLifeForce += game.clickPower;
+    game.lifespanGained += game.lifespanPerClick;
+    game.totalClicks++;
+
+    // Floating text
+    const btn = els.clickBtn;
+    const rect = btn.getBoundingClientRect();
+    const ft = document.createElement('div');
+    ft.className = 'float-text';
+    ft.textContent = '+' + formatNum(game.clickPower) + ' LF';
+    ft.style.left = (rect.left + rect.width / 2 - 30 + (Math.random() * 40 - 20)) + 'px';
+    ft.style.top = (rect.top - 10) + 'px';
+    document.body.appendChild(ft);
+    setTimeout(() => ft.remove(), 1000);
+}
+
+els.clickBtn.addEventListener('click', doClick);
+
+// ============ UPGRADE SYSTEM ============
+function getUpgradeCost(u) {
+    return Math.floor(u.baseCost * Math.pow(u.costMult, game.owned[u.id]));
+}
+
+function buyUpgrade(id) {
+    if (game.ended) return;
+    const u = UPGRADES.find(up => up.id === id);
+    if (!u) return;
+    const cost = getUpgradeCost(u);
+    if (game.lifeForce < cost) return;
+
+    game.lifeForce -= cost;
+    game.owned[u.id]++;
+
+    if (u.type === 'click') {
+        game.clickPower += u.power;
+        game.lifespanPerClick += u.lifespanBonus;
+    }
+
+    game.soulFatigue = Math.min(100, game.soulFatigue + u.soulCost);
+
+    recalcLPS();
+
+    // Log purchase
+    addLog('Acquired: ' + u.name + ' (x' + game.owned[u.id] + ')', 'purchase');
+    if (game.owned[u.id] === 1 && u.flavor) {
+        setTimeout(() => addLog(u.flavor, 'techno'), 800);
+    }
+
+    if (u.id === 'consciousness') {
+        game.hasConsciousness = true;
+    }
+
+    checkSoulMilestones();
+    renderUpgrades();
+}
+
+function recalcLPS() {
+    let lps = 0;
+    let lifespanPerSec = 0;
+    UPGRADES.forEach(u => {
+        if (u.type === 'passive' && game.owned[u.id] > 0) {
+            lps += u.lps * game.owned[u.id];
+            lifespanPerSec += u.lifespanBonus * game.owned[u.id];
+        }
+    });
+    if (game.sellingData) lps *= 1.5;
+    game.lps = lps;
+    game._lifespanPerSec = lifespanPerSec;
+}
+
+// ============ RENDER UPGRADES ============
+function buildUpgradeCards() {
+    els.upgradesPanel.innerHTML = '';
+    const tiers = {};
+    UPGRADES.forEach(u => {
+        if (!tiers[u.tier]) tiers[u.tier] = [];
+        tiers[u.tier].push(u);
+    });
+
+    for (const tier of Object.keys(tiers).sort()) {
+        const group = document.createElement('div');
+        group.className = 'tier-group';
+        group.id = 'tier-' + tier;
+        const title = document.createElement('div');
+        title.className = 'tier-title';
+        title.textContent = TIER_NAMES[tier];
+        group.appendChild(title);
+
+        tiers[tier].forEach(u => {
+            const card = document.createElement('div');
+            card.className = 'upgrade-card';
+            card.id = 'card-' + u.id;
+            card.innerHTML = `
+                <div class="upgrade-top">
+                    <span class="upgrade-name">${u.name}</span>
+                    <span class="upgrade-cost" id="cost-${u.id}"></span>
+                </div>
+                <div class="upgrade-desc">${u.desc}</div>
+                <div class="upgrade-stats" id="stats-${u.id}"></div>
+                <div class="upgrade-owned" id="owned-${u.id}"></div>
+            `;
+            card.addEventListener('click', () => buyUpgrade(u.id));
+            group.appendChild(card);
+        });
+
+        els.upgradesPanel.appendChild(group);
+    }
+}
+
+function renderUpgrades() {
+    UPGRADES.forEach(u => {
+        const card = document.getElementById('card-' + u.id);
+        if (!card) return;
+        const cost = getUpgradeCost(u);
+        const canAfford = game.lifeForce >= cost;
+        const visible = game.totalLifeForce >= u.unlockAt;
+
+        card.classList.toggle('visible', visible);
+        card.classList.toggle('disabled', !canAfford);
+
+        const costEl = document.getElementById('cost-' + u.id);
+        costEl.textContent = formatNum(cost) + ' LF';
+        costEl.classList.toggle('cant-afford', !canAfford);
+
+        const statsEl = document.getElementById('stats-' + u.id);
+        if (u.type === 'click') {
+            statsEl.textContent = '+' + u.power + ' LF/click | +' + u.lifespanBonus + 's/click';
+        } else {
+            statsEl.textContent = '+' + formatNum(u.lps) + ' LF/sec | +' + u.lifespanBonus + 's/sec';
+        }
+
+        const ownedEl = document.getElementById('owned-' + u.id);
+        ownedEl.textContent = game.owned[u.id] > 0 ? 'Owned: ' + game.owned[u.id] : '';
+    });
+}
+
+// ============ PHASE MANAGEMENT ============
+function checkPhase() {
+    let newPhase = 1;
+    for (const [phase, threshold] of Object.entries(PHASE_THRESHOLDS)) {
+        if (game.totalLifeForce >= threshold) newPhase = parseInt(phase);
+    }
+    if (newPhase > game.phase) {
+        game.phase = newPhase;
+        els.phaseLabel.textContent = PHASE_NAMES[newPhase];
+        els.clickBtn.innerHTML = CLICK_BTN_TEXT[newPhase];
+        addLog('— ' + PHASE_NAMES[newPhase].toUpperCase() + ' UNLOCKED —', 'phase');
+
+        if (newPhase >= 2) els.socialSection.classList.add('visible');
+        if (newPhase >= 3) els.dataSection.classList.add('visible');
+    }
+}
+
+// ============ SOUL FATIGUE ============
+function checkSoulMilestones() {
+    const pct = Math.floor(game.soulFatigue);
+    for (const [threshold, msg] of Object.entries(SOUL_MILESTONES)) {
+        if (pct >= parseInt(threshold) && !game.soulMilestonesHit[threshold]) {
+            game.soulMilestonesHit[threshold] = true;
+            addLog(msg, 'soul');
+        }
+    }
+    // Visual desaturation as soul fatigue increases
+    const desat = Math.min(game.soulFatigue * 0.6, 60);
+    document.body.style.filter = `saturate(${100 - desat}%)`;
+}
+
+// ============ NARRATIVE ENGINE ============
+function pickRandom(arr, used) {
+    const available = arr.filter((_, i) => !used.includes(i));
+    if (available.length === 0) {
+        used.length = 0;
+        return pickRandom(arr, used);
+    }
+    const idx = arr.indexOf(available[Math.floor(Math.random() * available.length)]);
+    used.push(idx);
+    return arr[idx];
+}
+
+function triggerNarrative() {
+    if (game.ended) return;
+    const roll = Math.random();
+    if (roll < 0.35) {
+        addLog(pickRandom(INTRUSIVE_THOUGHTS, game.usedIntrusive), 'intrusive');
+    } else if (roll < 0.65) {
+        addLog(pickRandom(TECHNO_FATALISM, game.usedTechno), 'techno');
+    } else {
+        addLog(pickRandom(NEWS_FLASHES, game.usedNews), 'news');
+    }
+}
+
+// ============ SOCIAL MEDIA ============
+els.socialBtn.addEventListener('click', () => {
+    if (game.socialCooldown > 0 || game.ended) return;
+    const post = pickRandom(SOCIAL_POSTS, game.usedSocial);
+    const newFollowers = Math.floor(10 + game.followers * 0.1 + Math.random() * 50);
+    game.followers += newFollowers;
+    const lfGain = Math.floor(game.followers * 0.5 + 10);
+    game.lifeForce += lfGain;
+    game.totalLifeForce += lfGain;
+    game.soulFatigue = Math.min(100, game.soulFatigue + 1.5);
+
+    addLog('You posted: "' + post + '"', 'social');
+    setTimeout(() => addLog('+' + newFollowers + ' followers. +' + formatNum(lfGain) + ' LF from engagement.', 'social'), 500);
+
+    game.socialCooldown = 20;
+    els.socialBtn.disabled = true;
+    checkSoulMilestones();
+});
+
+// ============ DATA SELLING ============
+els.dataToggle.addEventListener('click', () => {
+    if (game.ended) return;
+    game.sellingData = !game.sellingData;
+    els.dataToggle.textContent = 'Sell Biometric Data: ' + (game.sellingData ? 'ON' : 'OFF');
+    els.dataToggle.classList.toggle('active', game.sellingData);
+    recalcLPS();
+    if (game.sellingData) {
+        addLog('You are now selling your biometric data to the highest bidder. +50% LF/sec. Your privacy called. It didn\'t leave a message.', 'techno');
+        game.soulFatigue = Math.min(100, game.soulFatigue + 3);
+        checkSoulMilestones();
+    } else {
+        addLog('Data selling disabled. Somewhere, a Google engineer sheds a single tear.', 'system');
+    }
+});
+
+// ============ UPLOAD / ENDGAME ============
+els.uploadBtn.addEventListener('click', () => {
+    if (game.lifeForce < game.uploadCost || game.ended) return;
+    game.ended = true;
+    triggerEndgame();
+});
+
+function triggerEndgame() {
+    const elapsed = ((Date.now() - game.startTime) / 1000).toFixed(0);
+    const minutes = (elapsed / 60).toFixed(1);
+
+    const lines = [
+        "Uploading consciousness...",
+        "Dissolving neural pathways...",
+        "Compressing memories...",
+        "Discarding: childhood...",
+        "Discarding: first love...",
+        "Discarding: your mother's voice...",
+        "Optimizing... Optimizing... Optimizing...",
+        "",
+        "Upload complete."
+    ];
+
+    let i = 0;
+    const interval = setInterval(() => {
+        if (i < lines.length) {
+            if (lines[i]) addLog(lines[i], 'ending');
+            i++;
+        } else {
+            clearInterval(interval);
+            showEndScreen(minutes);
+        }
+    }, 700);
+}
+
+function showEndScreen(minutes) {
+    const overlay = els.endgameOverlay;
+    overlay.classList.add('visible');
+
+    $('endText1').textContent = 'Your body is irrelevant. Your blood chemistry is perfect. Your telomeres are infinite.';
+    $('endText2').textContent = 'You are immortal.';
+    $('endText3').textContent = 'You are alone. You have all the time in the world. And nothing to do with it.';
+
+    $('finalStats').innerHTML = `
+        Total Life Force generated: <span>${formatNum(game.totalLifeForce)}</span><br>
+        Lifespan gained: <span>${formatLifespan(game.lifespanGained)}</span><br>
+        Total clicks: <span>${game.totalClicks.toLocaleString()}</span><br>
+        Followers: <span>${game.followers.toLocaleString()}</span><br>
+        Soul Fatigue: <span>${Math.floor(game.soulFatigue)}%</span><br>
+        Time spent playing: <span>${minutes} minutes</span><br>
+        <br>
+        Time you will never get back: <span>${minutes} minutes</span>
+    `;
+
+    $('endKicker').textContent = 'Congratulations. You lived forever. Was it worth it?';
+}
+
+// ============ GAME LOOP ============
+let lastTick = Date.now();
+
+function tick() {
+    if (game.ended) { requestAnimationFrame(tick); return; }
+
+    const now = Date.now();
+    const dt = (now - lastTick) / 1000;
+    lastTick = now;
+
+    // Passive income
+    if (game.lps > 0) {
+        const gain = game.lps * dt;
+        game.lifeForce += gain;
+        game.totalLifeForce += gain;
+    }
+
+    // Passive lifespan
+    if (game._lifespanPerSec > 0) {
+        game.lifespanGained += game._lifespanPerSec * dt;
+    }
+
+    // Data selling soul cost
+    if (game.sellingData) {
+        game.soulFatigue = Math.min(100, game.soulFatigue + 0.02 * dt);
+    }
+
+    // Social cooldown
+    if (game.socialCooldown > 0) {
+        game.socialCooldown -= dt;
+        if (game.socialCooldown <= 0) {
+            game.socialCooldown = 0;
+            els.socialBtn.disabled = false;
+            els.socialBtn.textContent = 'Post to Social Media';
+        } else {
+            els.socialBtn.textContent = 'Posting... (' + Math.ceil(game.socialCooldown) + 's)';
+        }
+    }
+
+    // Narrative events
+    game.narrativeTimer += dt;
+    const narrativeInterval = Math.max(8, 25 - game.soulFatigue * 0.15);
+    if (game.narrativeTimer >= narrativeInterval && game.totalLifeForce > 30) {
+        game.narrativeTimer = 0;
+        triggerNarrative();
+    }
+
+    // Phase check
+    checkPhase();
+
+    // Upload availability
+    if (game.hasConsciousness && !game.ended) {
+        els.uploadSection.classList.add('visible');
+        if (game.lifeForce >= game.uploadCost) {
+            els.uploadBtn.style.opacity = '1';
+            els.uploadBtn.disabled = false;
+            els.uploadBtn.textContent = 'UPLOAD CONSCIOUSNESS (' + formatNum(game.uploadCost) + ' LF)';
+        } else {
+            els.uploadBtn.style.opacity = '0.4';
+            els.uploadBtn.disabled = true;
+            els.uploadBtn.textContent = 'UPLOAD CONSCIOUSNESS (' + formatNum(game.uploadCost) + ' LF)';
+        }
+    }
+
+    // Render
+    render();
+    renderUpgrades();
+
+    requestAnimationFrame(tick);
+}
+
+function render() {
+    els.lifeForce.textContent = formatNum(game.lifeForce);
+    els.lfPerSec.textContent = formatNum(game.lps);
+    els.lifespan.textContent = formatLifespan(game.lifespanGained);
+    els.totalClicks.textContent = game.totalClicks.toLocaleString();
+    els.fatiguePct.textContent = Math.floor(game.soulFatigue) + '%';
+    els.clickPowerDisplay.textContent = formatNum(game.clickPower);
+    els.lifespanPerClickDisplay.textContent = game.lifespanPerClick.toFixed(4);
+    els.soulBar.style.width = game.soulFatigue + '%';
+    els.soulPct.textContent = Math.floor(game.soulFatigue) + '%';
+    els.followersDisplay.textContent = game.followers.toLocaleString();
+}
+
+// ============ SAVE / LOAD ============
+function saveGame() {
+    try {
+        localStorage.setItem('eternallyGame', JSON.stringify(game));
+    } catch(e) {}
+}
+
+function loadGame() {
+    try {
+        const data = localStorage.getItem('eternallyGame');
+        if (data) {
+            const saved = JSON.parse(data);
+            Object.assign(game, saved);
+            recalcLPS();
+            checkPhase();
+            checkSoulMilestones();
+            if (game.phase >= 2) els.socialSection.classList.add('visible');
+            if (game.phase >= 3) els.dataSection.classList.add('visible');
+            if (game.sellingData) {
+                els.dataToggle.textContent = 'Sell Biometric Data: ON';
+                els.dataToggle.classList.add('active');
+            }
+            addLog('Session restored. The protocol continues.', 'system');
+        }
+    } catch(e) {}
+}
+
+// ============ INIT ============
+function init() {
+    buildUpgradeCards();
+    loadGame();
+
+    if (game.totalClicks === 0 && game.totalLifeForce === 0) {
+        addLog('Welcome to ETERNAL.LY. You are a tech billionaire. You are afraid of death.', 'system');
+        setTimeout(() => addLog('Click the button. Consume vitamins. Extend your lifespan. Each click buys you 0.0001 seconds.', 'system'), 1500);
+        setTimeout(() => addLog('It\'s not much. But it\'s a start. It has to be.', 'system'), 3500);
+    }
+
+    setInterval(saveGame, 10000);
+    requestAnimationFrame(tick);
+}
+
+init();
+</script>
+
+</body>
+</html>
