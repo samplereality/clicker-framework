@@ -1144,8 +1144,82 @@ function init() {
         await loadProjectList();
     });
 
+    // Theme toggle (dark/light)
+    const savedTheme = localStorage.getItem('builder-theme');
+    if (savedTheme === 'light') document.body.classList.add('light');
+    updateThemeIcon();
+
+    $('#btnThemeToggle').addEventListener('click', () => {
+        document.body.classList.toggle('light');
+        const isLight = document.body.classList.contains('light');
+        localStorage.setItem('builder-theme', isLight ? 'light' : 'dark');
+        updateThemeIcon();
+    });
+
+    // Export project as JSON
+    $('#btnExportJSON').addEventListener('click', async () => {
+        if (!currentName || !project) return alert('No project selected');
+        await saveProject();
+        const json = JSON.stringify(project, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = currentName + '.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+
+    // Import project from JSON
+    $('#btnImportJSON').addEventListener('click', () => {
+        $('#fileImportJSON').click();
+    });
+    $('#fileImportJSON').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            if (!data.config || !data.meta) {
+                throw new Error('Invalid project file: missing config or meta');
+            }
+            // Use the filename (without extension) as project name, fallback to meta.name
+            let name = data.meta.name || file.name.replace(/\.json$/, '');
+            name = name.replace(/[^a-zA-Z0-9_-]/g, '').substring(0, 80);
+            if (!name) name = 'imported';
+
+            // Check if name exists, append suffix if needed
+            const existing = projects.map(p => p.name);
+            let finalName = name;
+            let suffix = 1;
+            while (existing.includes(finalName)) {
+                finalName = name + '-' + suffix;
+                suffix++;
+            }
+            data.meta.name = finalName;
+            data.meta.updatedAt = new Date().toISOString();
+
+            // Create then overwrite with imported data
+            await api('POST', '/projects', { name: finalName });
+            await api('PUT', '/projects/' + finalName, data);
+            await loadProjectList();
+            await openProject(finalName);
+        } catch (err) {
+            alert('Import failed: ' + err.message);
+        }
+        // Reset file input so the same file can be re-imported
+        e.target.value = '';
+    });
+
     // Load projects
     loadProjectList();
+}
+
+function updateThemeIcon() {
+    const btn = $('#btnThemeToggle');
+    if (!btn) return;
+    const isLight = document.body.classList.contains('light');
+    btn.innerHTML = isLight ? '&#9789;' : '&#9788;';
+    btn.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
 }
 
 init();

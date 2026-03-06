@@ -16,10 +16,18 @@
         </div>
         <div class="sidebar-actions">
             <button class="btn btn-primary" id="btnNewProject">+ New Project</button>
+            <div style="display:flex; gap:6px; margin-top:8px">
+                <button class="btn btn-secondary btn-small" id="btnImportJSON" style="flex:1">Import JSON</button>
+                <button class="btn btn-secondary btn-small" id="btnExportJSON" style="flex:1">Export JSON</button>
+            </div>
+            <input type="file" accept=".json" class="file-input-hidden" id="fileImportJSON">
         </div>
         <div class="project-list" id="projectList"></div>
         <div class="sidebar-footer">
-            <div class="sidebar-footer-text">ClickerFramework Builder</div>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <div class="sidebar-footer-text">ClickerFramework Builder</div>
+                <button class="theme-toggle" id="btnThemeToggle" title="Toggle dark/light mode">&#9788;</button>
+            </div>
         </div>
     </aside>
 
