@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Builder</title>
+    <link rel="stylesheet" href="builder.css">
+</head>
+<body>
+
+<div class="app">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1>Clicker Builder</h1>
+        </div>
+        <div class="sidebar-actions">
+            <button class="btn btn-primary" id="btnNewProject">+ New Project</button>
+        </div>
+        <div class="project-list" id="projectList"></div>
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-text">ClickerFramework Builder</div>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main" id="main">
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState">
+            <h2>No project selected</h2>
+            <p>Create a new project or select one from the sidebar.</p>
+        </div>
+
+        <!-- Editor (hidden until project loaded) -->
+        <div class="editor" id="editor" style="display:none">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <h2 class="project-name" id="projectNameDisplay"></h2>
+                </div>
+                <div class="toolbar-right">
+                    <span class="save-status" id="saveStatus"></span>
+                    <button class="btn btn-secondary" id="btnPreview">Preview</button>
+                    <button class="btn btn-primary" id="btnExport">Export HTML</button>
+                    <button class="btn btn-danger" id="btnDelete">Delete</button>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs" id="tabs">
+                <button class="tab active" data-tab="general">General</button>
+                <button class="tab" data-tab="theme">Theme</button>
+                <button class="tab" data-tab="currencies">Currencies</button>
+                <button class="tab" data-tab="clicker">Clicker</button>
+                <button class="tab" data-tab="upgrades">Upgrades</button>
+                <button class="tab" data-tab="phases">Phases</button>
+                <button class="tab" data-tab="narrative">Narrative</button>
+                <button class="tab" data-tab="actions">Actions</button>
+                <button class="tab" data-tab="resources">Resources</button>
+                <button class="tab" data-tab="endgame">Endgame</button>
+                <button class="tab" data-tab="prestige">Prestige</button>
+                <button class="tab" data-tab="hooks">Hooks</button>
+            </div>
+
+            <!-- Tab panels -->
+            <div class="tab-content" id="tabContent"></div>
+        </div>
+    </main>
+</div>
+
+<!-- New Project Dialog -->
+<div class="dialog-overlay" id="newProjectDialog" style="display:none">
+    <div class="dialog">
+        <h3>New Project</h3>
+        <div class="field">
+            <label>Project Name</label>
+            <input type="text" id="newProjectName" placeholder="my-clicker-game" pattern="[a-zA-Z0-9_-]+">
+            <div class="hint">Letters, numbers, hyphens, underscores only</div>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn btn-secondary" id="btnCancelNew">Cancel</button>
+            <button class="btn btn-primary" id="btnConfirmNew">Create</button>
+        </div>
+    </div>
+</div>
+
+<script src="builder.js"></script>
+</body>
+</html>

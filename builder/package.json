@@ -1,0 +1,12 @@
+{
+  "name": "clicker-builder",
+  "version": "1.0.0",
+  "description": "Visual builder for ClickerFramework games — edit, preview, and export standalone HTML clicker games.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
