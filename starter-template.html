@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Clicker Game — Starter Template</title>
+    <link rel="stylesheet" href="clicker-framework.css">
+    <style>
+        /*
+         * Override any CSS variables here to theme your game.
+         * See clicker-framework.css for the full list.
+         */
+        :root {
+            --cf-accent: #4fc3f7;
+            --cf-accent-dim: #0d3d5c;
+        }
+    </style>
+</head>
+<body>
+
+<div id="clicker-game"></div>
+
+<script src="clicker-framework.js"></script>
+<script>
+// ====================================================================
+//  STARTER TEMPLATE — Minimal clicker game
+//
+//  Copy this file and fill in your own theme content.
+//  The framework handles all mechanics automatically.
+// ====================================================================
+
+const game = new ClickerGame({
+
+    // -- Identity --
+    title: 'MY CLICKER GAME',
+    tagline: 'Click the button. Watch numbers go up.',
+    logTitle: 'Event Log',
+
+    // -- Currencies --
+    // Define at least one. The primaryCurrency is used for clicking
+    // and buying upgrades by default.
+    currencies: {
+        gold: { name: 'Gold', abbr: 'G', initial: 0 },
+    },
+    primaryCurrency: 'gold',
+
+    // -- Clicker --
+    clicker: {
+        label: 'DIG',       // Button text (supports HTML)
+        basePower: 1,        // Starting gold per click
+    },
+
+    // -- Extra stats in the top bar (optional) --
+    stats: [],
+
+    // -- Tier display names --
+    tierNames: {
+        1: 'Tier I — Getting Started',
+        2: 'Tier II — Growing',
+        3: 'Tier III — Thriving',
+    },
+
+    // -- Upgrades --
+    // type: 'click'   → adds to click power
+    // type: 'passive' → adds to per-second income
+    upgrades: [
+        {
+            id: 'pickaxe', name: 'Better Pickaxe', tier: 1,
+            desc: 'A sharper pick for faster digging.',
+            flavor: 'The old one was basically a spoon.',
+            baseCost: 10, costMultiplier: 1.15, type: 'click', clickPower: 1,
+            unlockAt: 0,
+        },
+        {
+            id: 'miner', name: 'Hire a Miner', tier: 1,
+            desc: 'Someone else does the digging for you.',
+            flavor: 'He looks tired but motivated.',
+            baseCost: 25, costMultiplier: 1.15, type: 'passive', passiveRate: 0.5,
+            unlockAt: 10,
+        },
+        {
+            id: 'cart', name: 'Mine Cart', tier: 1,
+            desc: 'Haul more ore per trip.',
+            baseCost: 100, costMultiplier: 1.14, type: 'passive', passiveRate: 2,
+            unlockAt: 50,
+        },
+        {
+            id: 'drill', name: 'Steam Drill', tier: 2,
+            desc: 'Automated drilling machine.',
+            baseCost: 500, costMultiplier: 1.13, type: 'passive', passiveRate: 10,
+            unlockAt: 300,
+        },
+        {
+            id: 'dynamite', name: 'Dynamite', tier: 2,
+            desc: 'Blow through rock layers instantly.',
+            baseCost: 2500, costMultiplier: 1.12, type: 'passive', passiveRate: 50,
+            unlockAt: 1500,
+        },
+        {
+            id: 'refinery', name: 'Gold Refinery', tier: 3,
+            desc: 'Extract gold from even the poorest ore.',
+            baseCost: 15000, costMultiplier: 1.11, type: 'passive', passiveRate: 300,
+            unlockAt: 8000,
+        },
+    ],
+
+    // -- Phases (optional) --
+    // Phases change the header label and can swap the clicker button text.
+    phases: [
+        { id: 1, name: 'Chapter 1: The Prospect', threshold: 0 },
+        { id: 2, name: 'Chapter 2: The Mine', threshold: 300, clickerLabel: 'MINE' },
+        { id: 3, name: 'Chapter 3: The Empire', threshold: 8000, clickerLabel: 'COMMAND' },
+    ],
+
+    // -- Narrative (optional) --
+    // Random messages that appear in the log to add flavor.
+    narrative: {
+        channels: [
+            {
+                type: 'system',
+                weight: 1,
+                messages: [
+                    'The mine shaft creaks ominously.',
+                    'You spot a glint of gold in the wall.',
+                    'A canary sings. That seems like a good sign.',
+                    'The smell of earth and ambition fills the air.',
+                ],
+            },
+        ],
+        baseInterval: 30,
+        minInterval: 10,
+        minTotalToStart: 20,
+    },
+
+    // -- Custom actions (optional) --
+    // actions: [],
+
+    // -- Secondary resources / bars (optional) --
+    // resources: [],
+
+    // -- Endgame (optional) --
+    // endgame: { ... },
+
+    // -- Prestige (optional) --
+    // prestige: { ... },
+
+    // -- Lifecycle hooks --
+    onLoad: (g, wasRestored) => {
+        if (!wasRestored) {
+            g.log('Welcome, prospector. The mountain is waiting.', 'system');
+        }
+    },
+});
+
+game.start();
+</script>
+
+</body>
+</html>
