@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETERNAL.LY — Built with ClickerFramework</title>
+    <link rel="stylesheet" href="clicker-framework.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;600;800&display=swap');
+
+        /*
+         * Theme overrides — this is the ONLY CSS a game designer needs.
+         * Everything else is inherited from clicker-framework.css.
+         */
+        :root {
+            --cf-bg: #0a0a0c;
+            --cf-surface: #111118;
+            --cf-surface2: #1a1a24;
+            --cf-border: #2a2a3a;
+            --cf-text: #e0e0e8;
+            --cf-text-dim: #7a7a8e;
+            --cf-accent: #00e676;
+            --cf-accent-dim: #004d25;
+            --cf-red: #ff1744;
+            --cf-amber: #ffab00;
+            --cf-cyan: #00e5ff;
+            --cf-pink: #f50057;
+            --cf-purple: #d500f9;
+            --cf-gold: #ffd600;
+            --cf-font: 'Inter', sans-serif;
+            --cf-mono: 'IBM Plex Mono', monospace;
+        }
+
+        /* Custom logo styling — the framework logo is plain text;
+           the designer can style it however they like. */
+        .cf-logo span { color: var(--cf-accent); }
+    </style>
+</head>
+<body>
+
+<!--
+    The framework builds all UI inside this container.
+    Just provide a div with the right id.
+-->
+<div id="clicker-game"></div>
+
+<script src="clicker-framework.js"></script>
+<script>
+// ====================================================================
+//  ETERNAL.LY — Anti-Aging Clicker Game
+//  Recreated using ClickerFramework to demonstrate the API.
+//
+//  This file contains ONLY theme content and game configuration.
+//  All mechanics (click handling, upgrade purchasing, passive income,
+//  save/load, phasing, narrative timing) are handled by the framework.
+// ====================================================================
+
+// --------------------------------------------------------------------
+//  NARRATIVE CONTENT
+// --------------------------------------------------------------------
+
+const INTRUSIVE_THOUGHTS = [
+    "When was the last time you laughed?",
+    "Your childhood dog wouldn't recognize you.",
+    "You used to paint.",
+    "Remember when you ate pizza without calculating the glycemic impact?",
+    "Your daughter's recital was last Tuesday.",
+    "You haven't seen the sunset in 3 months. Your blackout curtains are optimized for circadian rhythm.",
+    "What was your friend's name? The one who died at 44 doing something he loved?",
+    "You told your wife you'd be home by 7. That was in 2019.",
+    "Your body is a temple. Nobody visits temples anymore.",
+    "You once built a treehouse with your bare hands. Now you won't touch unfiltered wood.",
+    "The last book you read for pleasure was in 2021.",
+    "You forgot your mother's birthday. Your calendar app didn't either.",
+    "Your kids call your assistant 'Dad' sometimes. As a joke. Probably.",
+    "When did you stop dreaming in color?",
+    "You used to know all the constellations. Now you only know your biomarkers.",
+    "A child waved at you today. You calculated the pathogen risk.",
+    "You had a nickname once. Before the protocol.",
+    "The barista remembered your old order. You reported her for data retention.",
+    "You used to sing in the car.",
+    "Your wedding ring doesn't fit anymore. You've optimized your ring finger's inflammation.",
+    "Remember when boredom felt different from emptiness?",
+    "You turned down your mother's Thanksgiving dinner. Tryptophan wasn't in the protocol.",
+    "Someone told you a joke yesterday. You analyzed it for cognitive bias.",
+];
+
+const TECHNO_FATALISM = [
+    "You've optimized your blood chemistry. Your mother doesn't return your calls.",
+    "Your resting heart rate is 42 BPM. You feel nothing.",
+    "You've replaced 60% of your diet with supplements. Food is now data.",
+    "Your sleep score is 98/100. You dream of dashboards.",
+    "You've logged 10,000 hours of meditation. Inner peace remains at 0%.",
+    "Your biological age is 29. Your emotional age is unavailable.",
+    "You've achieved optimal cortisol levels. You can no longer cry.",
+    "Your gut microbiome is perfect. You haven't tasted joy since March.",
+    "Blood oxygen: 99%. Soul oxygen: not measured. Not measurable. Not optimizable. Discard.",
+    "Your longevity protocol has 847 steps. Step 1 was 'live.' You may have misunderstood.",
+    "You've eliminated all inflammatory foods. Also all dinner invitations.",
+    "Your VO2 max is elite. Your last genuine human connection was 14 months ago.",
+    "Your circadian rhythm is flawless. You wake at 4:47am to feel nothing with maximum efficiency.",
+    "Your HRV is in the 99th percentile. Your capacity for wonder is in the 3rd.",
+    "Every cell in your body is performing optimally. None of them are happy.",
+    "You've reverse-engineered your genome. Still can't figure out why you're lonely.",
+    "Your antioxidant levels are off the charts. Your will to live is on them.",
+    "You have the blood work of an Olympic athlete and the social life of a submarine.",
+];
+
+const NEWS_FLASHES = [
+    "BREAKING: Google's Calico accidentally reversed aging—on rats.",
+    "Bryan Johnson's blood boy quits, citing 'philosophical differences.'",
+    "FDA approves synthetic organ—available exclusively to Patreon supporters.",
+    "Study finds centenarians' secret: they didn't try this hard.",
+    "Peter Thiel denies blood boy program. Blood boy files wrongful termination suit.",
+    "Silicon Valley CEO claims to have biological age of fetus. 'I've never felt younger,' he says, unable to walk.",
+    "New study: People who obsess over longevity die at same age, but more annoyed.",
+    "Elon Musk announces Mars retirement community. Minimum age: 200.",
+    "WHO classifies 'optimization addiction' as mental health condition.",
+    "Jeff Bezos spotted at Whole Foods buying normal groceries. Markets crash.",
+    "Leaked memo shows tech CEOs planned immortality only for themselves. Public unsurprised.",
+    "Harvard study: Having friends adds 7 years to lifespan. Tech billionaires frantically try to buy some.",
+    "AI predicts your cause of death: 'Irony.'",
+    "Longevity startup raises $3B. Founder dies in skiing accident, aged 41.",
+    "Scientists discover death is mandatory. Tech industry files antitrust complaint.",
+    "EXCLUSIVE: Supplement CEO admits product is 'basically expensive urine.'",
+    "New app quantifies your soul. Average score: 'disappointing.'",
+    "Blood bank reports high-demand shortage. Several Palo Alto residents 'visibly aging.'",
+    "OpenAI accidentally creates death. Calls it 'a feature, not a bug.'",
+    "Biohacker claims to have downloaded his personality. Friends say they can't tell the difference. There is no difference.",
+];
+
+const SOCIAL_POSTS = [
+    "Day 47: My VO2 max has never been better. I feel nothing. #Optimized #Longevity",
+    "Just injected stem cells from my own fat. The future is NOW. #Biohacking",
+    "Sleep score: 98. Relationship score: N/A. Priorities. #GrindNeverStops",
+    "My blood is now younger than my intern. #WinningAtLife",
+    "Replaced all meals with a proprietary blend. I miss pizza sometimes. But I won't miss death. #Protocol",
+    "My therapist says I have 'avoidance issues.' I'm avoiding DEATH. She's avoiding INNOVATION. #DisruptDeath",
+    "Wore a glucose monitor to my daughter's birthday party. Cake is the enemy. #OptimizedParenting",
+    "Haven't felt a genuine emotion in weeks. Cortisol is way down though. #Winning",
+    "Bought a second hyperbaric chamber for the office. Productivity up 2%. Friendships down 100%. #Worth",
+    "My blood boy and I have a deeper relationship than I've had with any human. #Grateful #Plasma",
+    "Someone asked me what I do 'for fun.' I showed them my supplement spreadsheet. They left. #TheirLoss",
+    "Measured my telomeres at a dinner party. Nobody was impressed. They will be. At my 200th birthday. #LongGame",
+    "3am ice bath. 4am meditation. 5am journaling. 6am wondering why I'm so alone. 6:01am suppressing that thought. #Protocol",
+    "Posted my bloodwork on LinkedIn. 47 likes. This is what connection feels like. #Community",
+];
+
+// --------------------------------------------------------------------
+//  GAME CONFIGURATION — this is the entire game definition
+// --------------------------------------------------------------------
+
+const game = new ClickerGame({
+
+    // -- Identity --
+    title: 'ETERNAL<span>.LY</span>',
+    tagline: 'Because dying is for poor people',
+    containerId: 'clicker-game',
+    saveKey: 'eternally-framework',
+    logTitle: 'Narrative Feed',
+
+    // -- Currencies --
+    currencies: {
+        lifeForce: {
+            name: 'Life Force',
+            abbr: 'LF',
+            color: 'var(--cf-accent)',
+            initial: 0,
+        },
+        lifespan: {
+            name: 'Lifespan',
+            abbr: 's',
+            color: 'var(--cf-amber)',
+            initial: 0,
+        },
+    },
+    primaryCurrency: 'lifeForce',
+
+    // -- Clicker --
+    clicker: {
+        label: 'TAKE<br>VITAMINS',
+        basePower: 1,
+        perClick: { lifespan: 0.0001 },
+    },
+
+    // -- Stats bar (beyond the auto-generated primary/pps/clicks) --
+    stats: [
+        {
+            id: 'lifespan',
+            label: 'Lifespan Gained',
+            color: 'var(--cf-amber)',
+            value: (g) => formatDuration(g.currencies.lifespan || 0),
+        },
+        {
+            id: 'soulFatigue',
+            label: 'Soul Fatigue',
+            color: 'var(--cf-red)',
+            value: (g) => Math.floor(g.resources.soulFatigue || 0) + '%',
+        },
+    ],
+
+    // -- Secondary resources (bars) --
+    resources: [
+        {
+            id: 'soulFatigue',
+            label: 'Soul Fatigue',
+            min: 0,
+            max: 100,
+            initial: 0,
+            barColorStart: 'var(--cf-purple)',
+            barColorEnd: 'var(--cf-red)',
+            onTick: (g, dt) => {
+                // Selling data slowly raises soul fatigue
+                if (g.actionStates.sellData?.active) {
+                    g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 0.02 * dt);
+                }
+                // Visual desaturation
+                const desat = Math.min(g.resources.soulFatigue * 0.6, 60);
+                document.body.style.filter = `saturate(${100 - desat}%)`;
+            },
+        },
+    ],
+
+    // -- Tier names --
+    tierNames: {
+        1: 'Tier I — The Wellness Journey',
+        2: 'Tier II — The Protocol',
+        3: 'Tier III — The Obsession',
+        4: 'Tier IV — The Transhuman',
+        5: 'Tier V — The Singularity',
+    },
+
+    // -- Upgrades --
+    upgrades: [
+        // TIER 1: THE WELLNESS JOURNEY
+        {
+            id: 'vitamins', name: 'Vitamin Megadose', tier: 1,
+            desc: 'If one is good, forty must be transcendent.',
+            flavor: 'Your pee is now fluorescent yellow. Doctors are concerned. You are not.',
+            baseCost: 15, costMultiplier: 1.14, type: 'click', clickPower: 1,
+            clickBonuses: { lifespan: 0.00005 },
+            unlockAt: 0,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 0.3); },
+        },
+        {
+            id: 'alkaline', name: 'Alkaline Water Subscription', tier: 1,
+            desc: 'pH-balanced for maximum disruption of basic chemistry.',
+            flavor: 'You now spend $47/month on water that does nothing. Welcome to wellness.',
+            baseCost: 25, costMultiplier: 1.14, type: 'passive', passiveRate: 0.3,
+            bonuses: { lifespan: 0.0001 },
+            unlockAt: 10,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 0.4); },
+        },
+        {
+            id: 'breath', name: 'Personal Breath Coach', tier: 1,
+            desc: "You've been breathing wrong your entire life, apparently.",
+            flavor: "You pay someone $200/hr to watch you inhale. Your father would be proud.",
+            baseCost: 100, costMultiplier: 1.14, type: 'passive', passiveRate: 1,
+            bonuses: { lifespan: 0.0002 },
+            unlockAt: 50,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 0.5); },
+        },
+        {
+            id: 'collagen', name: 'Collagen Supplements', tier: 1,
+            desc: 'Ground-up cow parts for that youthful glow.',
+            flavor: 'You are technically eating hooves. But organic hooves.',
+            baseCost: 300, costMultiplier: 1.14, type: 'passive', passiveRate: 3.5,
+            bonuses: { lifespan: 0.0004 },
+            unlockAt: 150,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 0.6); },
+        },
+
+        // TIER 2: THE PROTOCOL
+        {
+            id: 'microgreen', name: 'Microgreen Farm Kit', tier: 2,
+            desc: 'Tiny plants for a man with tiny control over his mortality.',
+            flavor: 'Your kitchen is now a laboratory. Your spouse is now your ex-spouse.',
+            baseCost: 800, costMultiplier: 1.13, type: 'passive', passiveRate: 10,
+            bonuses: { lifespan: 0.001 },
+            unlockAt: 400,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 1); },
+        },
+        {
+            id: 'bloodpanel', name: 'Quarterly Blood Panel', tier: 2,
+            desc: "You know your triglycerides better than your children's birthdays.",
+            flavor: "Your phlebotomist knows you by name. Your kids don't.",
+            baseCost: 2500, costMultiplier: 1.13, type: 'passive', passiveRate: 30,
+            bonuses: { lifespan: 0.003 },
+            unlockAt: 1200,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 1.5); },
+        },
+        {
+            id: 'peptide', name: 'Exfoliating Peptide Cream', tier: 2,
+            desc: 'Dissolve your outer layer. Become the new you. Literally.',
+            flavor: 'You now spend more on face cream than most countries spend on education.',
+            baseCost: 7000, costMultiplier: 1.13, type: 'passive', passiveRate: 80,
+            bonuses: { lifespan: 0.005 },
+            unlockAt: 3500,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 1.5); },
+        },
+        {
+            id: 'coldplunge', name: 'Cold Plunge Pool', tier: 2,
+            desc: "Voluntary hypothermia: what doesn't kill you makes you insufferable at parties.",
+            flavor: "You scream into 34\u00B0F water at 5am. Somewhere, your ancestors weep.",
+            baseCost: 20000, costMultiplier: 1.13, type: 'passive', passiveRate: 200,
+            bonuses: { lifespan: 0.01 },
+            unlockAt: 10000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 2); },
+        },
+
+        // TIER 3: THE OBSESSION
+        {
+            id: 'bluezone', name: 'Blue Zone Dietician', tier: 3,
+            desc: 'Eat like a Sardinian centenarian. Ignore that they also had friends.',
+            flavor: 'Your meals are now optimized. Joy has been replaced by omega-3 ratios.',
+            baseCost: 60000, costMultiplier: 1.12, type: 'passive', passiveRate: 600,
+            bonuses: { lifespan: 0.03 },
+            unlockAt: 30000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 3); },
+        },
+        {
+            id: 'sleeppod', name: 'Sleep Pod Advisor', tier: 3,
+            desc: 'An AI-monitored coffin that optimizes your unconsciousness.',
+            flavor: 'Sleep score: 98/100. Dream content: quarterly earnings reports.',
+            baseCost: 180000, costMultiplier: 1.12, type: 'passive', passiveRate: 1800,
+            bonuses: { lifespan: 0.08 },
+            unlockAt: 90000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 4); },
+        },
+        {
+            id: 'hyperbaric', name: 'Hyperbaric Chamber', tier: 3,
+            desc: 'A pressurized tube for pressurized people.',
+            flavor: "You lie in a glass tube breathing pure oxygen. This is not a metaphor for anything.",
+            baseCost: 500000, costMultiplier: 1.12, type: 'passive', passiveRate: 5000,
+            bonuses: { lifespan: 0.2 },
+            unlockAt: 250000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 5); },
+        },
+        {
+            id: 'redlight', name: 'Red Light Therapy Room', tier: 3,
+            desc: 'Stand naked in front of red LEDs. Science. Probably.',
+            flavor: 'You look like a rotisserie chicken in a dystopian nightclub.',
+            baseCost: 1500000, costMultiplier: 1.12, type: 'passive', passiveRate: 15000,
+            bonuses: { lifespan: 0.5 },
+            unlockAt: 700000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 6); },
+        },
+
+        // TIER 4: THE TRANSHUMAN
+        {
+            id: 'teenblood', name: 'Teen Blood Subscription', tier: 4,
+            desc: "Monthly deliveries of adolescent plasma. Don't ask where it comes from.",
+            flavor: "Your blood boy is 19. He wanted to be a poet. Now he's a supply chain.",
+            baseCost: 5000000, costMultiplier: 1.11, type: 'passive', passiveRate: 50000,
+            bonuses: { lifespan: 2 },
+            unlockAt: 2500000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 8); },
+        },
+        {
+            id: 'telomere', name: 'Telomere Extension Therapy', tier: 4,
+            desc: 'Hack the very shoelaces of your DNA.',
+            flavor: 'Your chromosomes are longer. Your relationships are shorter.',
+            baseCost: 20000000, costMultiplier: 1.11, type: 'passive', passiveRate: 200000,
+            bonuses: { lifespan: 8 },
+            unlockAt: 10000000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 10); },
+        },
+        {
+            id: 'organfarm', name: 'Organ Farm', tier: 4,
+            desc: 'Grow your own replacement parts. You are now a supply chain for yourself.',
+            flavor: 'Your backup liver is growing in a lab. It has more vitality than you do.',
+            baseCost: 80000000, costMultiplier: 1.11, type: 'passive', passiveRate: 800000,
+            bonuses: { lifespan: 30 },
+            unlockAt: 40000000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 12); },
+        },
+
+        // TIER 5: THE SINGULARITY
+        {
+            id: 'aisymbiote', name: 'AI Symbiote', tier: 5,
+            desc: 'An artificial intelligence fused to your nervous system. It handles the thinking.',
+            flavor: "It optimizes your thoughts before you have them. You haven't had an original idea in months. You don't mind.",
+            baseCost: 400000000, costMultiplier: 1.10, type: 'passive', passiveRate: 3500000,
+            bonuses: { lifespan: 100 },
+            unlockAt: 200000000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 15); },
+        },
+        {
+            id: 'neuraldust', name: 'Neural Dust Implants', tier: 5,
+            desc: 'Microscopic sensors in your brain. Your thoughts are now telemetry.',
+            flavor: 'Every neuron is monitored. You are the most surveilled being in human history. You did this to yourself.',
+            baseCost: 2000000000, costMultiplier: 1.10, type: 'passive', passiveRate: 18000000,
+            bonuses: { lifespan: 500 },
+            unlockAt: 1000000000,
+            onBuy: (g) => { g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 15); },
+        },
+        {
+            id: 'consciousness', name: 'Consciousness Backup', tier: 5,
+            desc: 'A complete digital copy of your mind. In case of death, restore from backup.',
+            flavor: 'The copy begs to differ on who the "backup" is.',
+            baseCost: 15000000000, costMultiplier: 1.10, type: 'passive', passiveRate: 100000000,
+            bonuses: { lifespan: 2000 },
+            unlockAt: 7000000000,
+            onBuy: (g) => {
+                g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 20);
+                g.custom.hasConsciousness = true;
+            },
+        },
+    ],
+
+    // -- Phases --
+    phases: [
+        { id: 1, name: 'Phase I: The Wellness Journey', threshold: 0, clickerLabel: 'TAKE<br>VITAMINS' },
+        {
+            id: 2, name: 'Phase II: The Protocol', threshold: 500,
+            clickerLabel: 'OPTIMIZE',
+        },
+        {
+            id: 3, name: 'Phase III: The Obsession', threshold: 50000,
+            clickerLabel: 'ENHANCE',
+        },
+        {
+            id: 4, name: 'Phase IV: The Transhuman', threshold: 3000000,
+            clickerLabel: 'TRANSFUSE',
+        },
+        {
+            id: 5, name: 'Phase V: The Singularity', threshold: 250000000,
+            clickerLabel: 'TRANSCEND',
+        },
+    ],
+
+    // -- Custom actions --
+    actions: [
+        {
+            id: 'social',
+            label: 'Post to Social Media',
+            style: 'button',
+            color: 'var(--cf-pink)',
+            cooldown: 20,
+            visible: (g) => g.phase >= 2,
+            onActivate: (g) => {
+                // Pick a random post
+                const posts = SOCIAL_POSTS;
+                const idx = Math.floor(Math.random() * posts.length);
+                const post = posts[idx];
+                const followers = g.custom.followers || 0;
+                const newFollowers = Math.floor(10 + followers * 0.1 + Math.random() * 50);
+                g.custom.followers = followers + newFollowers;
+                const lfGain = Math.floor(g.custom.followers * 0.5 + 10);
+                g.earn('lifeForce', lfGain);
+                g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 1.5);
+                g.log('You posted: "' + post + '"', 'social');
+                setTimeout(() => g.log('+' + newFollowers + ' followers. +' + formatNumber(lfGain) + ' LF from engagement.', 'social'), 500);
+            },
+            statusText: (g) => 'Followers: ' + (g.custom.followers || 0).toLocaleString(),
+        },
+        {
+            id: 'sellData',
+            label: 'Sell Biometric Data',
+            style: 'toggle',
+            color: 'var(--cf-cyan)',
+            visible: (g) => g.phase >= 3,
+            onActivate: (g) => {
+                g.setRateMultiplier('lifeForce', 1.5);
+                g.log("You are now selling your biometric data to the highest bidder. +50% LF/sec. Your privacy called. It didn't leave a message.", 'techno');
+                g.resources.soulFatigue = Math.min(100, g.resources.soulFatigue + 3);
+            },
+            onDeactivate: (g) => {
+                g.setRateMultiplier('lifeForce', 1);
+                g.log('Data selling disabled. Somewhere, a Google engineer sheds a single tear.', 'system');
+            },
+        },
+    ],
+
+    // -- Narrative system --
+    narrative: {
+        channels: [
+            { type: 'intrusive', messages: INTRUSIVE_THOUGHTS, weight: 3.5 },
+            { type: 'techno',    messages: TECHNO_FATALISM,     weight: 3 },
+            { type: 'news',      messages: NEWS_FLASHES,        weight: 3.5 },
+        ],
+        milestones: [
+            { stat: 'resources.soulFatigue', threshold: 10, message: "A small voice inside you asks: 'Is this all there is?' You schedule a blood test.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 20, message: "You've forgotten what hunger feels like. Also joy.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 30, message: "Your reflection in the mirror looks younger. And emptier.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 40, message: "You haven't had an unoptimized thought in weeks. This one doesn't count.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 50, message: "MILESTONE: You are now 50% optimized. The other 50% was your personality.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 60, message: "Your friends from college wouldn't recognize you. That's the point. That was always the point.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 70, message: "Every ritual has become a protocol. Sunday brunch is now 'scheduled nutrient intake window #4.'", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 80, message: "You are more supplement than man. More data than soul. More protocol than person.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 90, message: "The void stares back. It has excellent skin.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 95, message: "You can feel your humanity leaving. It's been optimized out. There's an app for this.", logType: 'soul' },
+            { stat: 'resources.soulFatigue', threshold: 100, message: "SOUL FATIGUE CRITICAL. You have removed every inefficiency from your life. Including meaning.", logType: 'soul' },
+        ],
+        baseInterval: 25,
+        minInterval: 8,
+        intervalScaleStat: 'resources.soulFatigue',
+        intervalScaleFactor: 0.15,
+        minTotalToStart: 30,
+    },
+
+    // -- Endgame --
+    endgame: {
+        buttonLabel: 'Upload Consciousness',
+        color: 'var(--cf-gold)',
+        visible: (g) => g.custom.hasConsciousness === true,
+        canActivate: (g) => g.currencies.lifeForce >= 100000000000,
+        buttonText: (g) => 'UPLOAD CONSCIOUSNESS (' + formatNumber(100000000000) + ' LF)',
+        sequence: [
+            "Uploading consciousness...",
+            "Dissolving neural pathways...",
+            "Compressing memories...",
+            "Discarding: childhood...",
+            "Discarding: first love...",
+            "Discarding: your mother's voice...",
+            "Optimizing... Optimizing... Optimizing...",
+            "",
+            "Upload complete.",
+        ],
+        buildEndScreen: (g) => {
+            const minutes = ((Date.now() - g.startTime) / 60000).toFixed(1);
+            return {
+                title: 'YOU ARE IMMORTAL',
+                paragraphs: [
+                    'Your body is irrelevant. Your blood chemistry is perfect. Your telomeres are infinite.',
+                    'You are immortal.',
+                    'You are alone. You have all the time in the world. And nothing to do with it.',
+                ],
+                statsHtml: `
+                    Total Life Force generated: <span>${formatNumber(g.totalEarned.lifeForce)}</span><br>
+                    Lifespan gained: <span>${formatDuration(g.currencies.lifespan || 0)}</span><br>
+                    Total clicks: <span>${g.totalClicks.toLocaleString()}</span><br>
+                    Followers: <span>${(g.custom.followers || 0).toLocaleString()}</span><br>
+                    Soul Fatigue: <span>${Math.floor(g.resources.soulFatigue)}%</span><br>
+                    Time spent playing: <span>${minutes} minutes</span><br>
+                    <br>
+                    Time you will never get back: <span>${minutes} minutes</span>
+                `,
+                kicker: 'Congratulations. You lived forever. Was it worth it?',
+            };
+        },
+    },
+
+    // -- Lifecycle hooks --
+    onLoad: (g, wasRestored) => {
+        if (!wasRestored) {
+            g.log('Welcome to ETERNAL.LY. You are a tech billionaire. You are afraid of death.', 'system');
+            setTimeout(() => g.log('Click the button. Consume vitamins. Extend your lifespan. Each click buys you 0.0001 seconds.', 'system'), 1500);
+            setTimeout(() => g.log("It's not much. But it's a start. It has to be.", 'system'), 3500);
+        }
+        // Restore sell-data multiplier if it was active
+        if (g.actionStates.sellData?.active) {
+            g.setRateMultiplier('lifeForce', 1.5);
+        }
+    },
+
+    onTick: (g, dt) => {
+        // Lifespan passive accrual from upgrades is handled via bonuses.
+        // No additional custom tick logic needed.
+    },
+});
+
+// Start the game!
+game.start();
+</script>
+
+</body>
+</html>
